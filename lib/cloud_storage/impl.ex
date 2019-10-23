@@ -7,7 +7,7 @@ defmodule GCloudex.CloudStorage.Impl do
     quote do 
       use GCloudex.CloudStorage.Request
 
-      @endpoint "storage.googleapis.com"
+      @endpoint "https://www.googleapis.com/storage"
       @project  GCloudex.get_project_id
 
       ###################
@@ -287,6 +287,17 @@ defmodule GCloudex.CloudStorage.Impl do
         request_query :get, bucket, [], "",
           object <> "?" <> parse_query_params(query_params, "")
       end
+	  
+      @doc"""
+      Downloads the 'object' from the specified 'bucket' using the given
+      'query_params'. The query parameters must be passed as a list of tuples
+      [{param_1, value_1}, {param_2, value_2}]. The requester must have READ
+      permission.
+      """
+	  @spec download_object(bucket :: binary, object :: binary, query_params :: [{binary, binary}]) :: HTTPResponse.t
+	  def download_object(bucket, object, query_params) do 
+		  download :get, bucket, object, query_params˝
+	  end
 
       @doc"""
       Lists the 'object' ACL from the specified 'bucket'. The requester must have
@@ -296,7 +307,7 @@ defmodule GCloudex.CloudStorage.Impl do
       def get_object_acl(bucket, object) do
         request_query :get, bucket, [], "", object <> "?acl"
       end
-
+	  
       ###################
       ### HEAD Object ###
       ###################

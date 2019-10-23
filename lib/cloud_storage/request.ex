@@ -60,6 +60,21 @@ defmodule GCloudex.CloudStorage.Request do
           [timeout: 50_000, recv_timeout: 50_000]
         )
       end
+	  
+      @doc"""
+      Sends an HTTP request with the specified query parameters to download file from bucket
+      """
+      @spec request_query(atom, binary, list(tuple), binary, binary) :: HTTPResponse.t
+	  def download(verb, bucket, headers \\ [], body \\ "", parameters) do
+          HTTP.request(
+            verb,
+			"https://www.googleapis.com/download/storage/v1/b/" <> bucket <> "/o/" + object <> "?" <> parameters,
+            body,
+            headers ++ [{"Authorization",
+                         "Bearer #{Auth.get_token_storage(:full_control)}"}],
+            [timeout: 50_000, recv_timeout: 50_000]
+          )
+	  end
 
       defoverridable [
         request_service: 0, 
