@@ -150,7 +150,7 @@ defmodule GCloudex.CloudStorage.Impl do
       """
       @spec create_bucket(bucket :: binary) :: HTTPResponse.t
       def create_bucket(bucket) do
-        headers = [{"x-goog-project-id", get_project_id}]
+        headers = [{"x-goog-project-id", get_project_id()}]
 
         request :put, bucket, headers, ""
       end
@@ -162,7 +162,7 @@ defmodule GCloudex.CloudStorage.Impl do
       """
       @spec create_bucket(bucket :: binary, region :: binary) :: HTTPResponse.t
       def create_bucket(bucket, region) do
-        headers = [{"x-goog-project-id", get_project_id}]
+        headers = [{"x-goog-project-id", get_project_id()}]
         body    =
           """
           <CreateBucketConfiguration>
@@ -179,7 +179,7 @@ defmodule GCloudex.CloudStorage.Impl do
       """
       @spec create_bucket(bucket :: binary, region :: binary, class :: binary) :: HTTPResponse.t
       def create_bucket(bucket, region, class) do
-        headers = [{"x-goog-project-id", get_project_id}]
+        headers = [{"x-goog-project-id", get_project_id()}]
 
         body =
           """

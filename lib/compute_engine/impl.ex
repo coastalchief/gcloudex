@@ -432,7 +432,7 @@ defmodule GCloudex.ComputeEngine.Impl do
             %{"fields" => fields} |> URI.encode_query
           end
 
-        new_ep = get_no_zone_ep() |> String.replace(get_project_id, project)
+        new_ep = get_no_zone_ep() |> String.replace(get_project_id(), project)
 
         request(:get, new_ep <> "/global/images/#{image}", [], "", query)
       end

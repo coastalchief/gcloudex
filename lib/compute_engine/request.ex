@@ -31,7 +31,7 @@ defmodule GCloudex.ComputeEngine.Request do
           verb,
           endpoint,
           body,
-          headers ++ [{"x-goog-project-id", get_project_id},
+          headers ++ [{"x-goog-project-id", get_project_id()},
                       {"Authorization", "Bearer #{Auth.get_token_storage(:compute)}"}],
           []
           )
