@@ -7,11 +7,21 @@ defmodule GCloudex.ComputeEngine.Impl do
   defmacro __using__(:compute_engine) do 
     quote do 
       use GCloudex.ComputeEngine.Request
-
-      @project_id   GCloudex.get_project_id
-      @instance_ep "https://www.googleapis.com/compute/v1/projects/#{@project_id}/zones"
-      @no_zone_ep  "https://www.googleapis.com/compute/v1/projects/#{@project_id}"
-
+	  
+	  def get_project_id() do
+	   	{:ok, client_id} = Goth.Config.get("client_email")
+	   	{:ok, project_id} = Goth.Config.get(client_id, :project_id)
+		project_id
+	  end
+	  
+	  def get_instance_ep() do
+		 "https://www.googleapis.com/compute/v1/projects/#{get_project_id()}/zones" 
+	  end
+	  
+	  def get_no_zone_ep() do
+		  "https://www.googleapis.com/compute/v1/projects/#{get_project_id()}"
+	  end
+	  
       ###################
       ### Autoscalers ###
       ###################
@@ -24,7 +34,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def list_autoscalers(zone, query_params \\ %{}) do
         query = query_params |> URI.encode_query
 
-        request :get, @no_zone_ep <> "/zones/#{zone}/autoscalers", [], "", query
+        request :get, get_no_zone_ep() <> "/zones/#{zone}/autoscalers", [], "", query
       end
 
       @doc """
@@ -34,7 +44,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def get_autoscaler(zone, autoscaler, fields \\ "") do
         query = fields_binary_to_map fields
 
-        request :get, @no_zone_ep <> "/zones/#{zone}/autoscalers/#{autoscaler}", [], "", query
+        request :get, get_no_zone_ep() <> "/zones/#{zone}/autoscalers/#{autoscaler}", [], "", query
       end
 
       @doc """
@@ -51,7 +61,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @no_zone_ep <> "/zones/#{zone}/autoscalers", 
+          get_no_zone_ep() <> "/zones/#{zone}/autoscalers", 
           [{"Content-Type", "application/json"}], 
           body, 
           query)
@@ -74,7 +84,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :patch, 
-          @no_zone_ep <> "/zones/#{zone}/autoscalers", 
+          get_no_zone_ep() <> "/zones/#{zone}/autoscalers", 
           [{"Content-Type", "application/json"}],
           body,
           query)
@@ -102,7 +112,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :put, 
-          @no_zone_ep <> "/zones/#{zone}/autoscalers",
+          get_no_zone_ep() <> "/zones/#{zone}/autoscalers",
           [{"Content-Type", "application/json"}],
           body,
           query)
@@ -115,7 +125,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def delete_autoscaler(zone, autoscaler, fields \\ "") do
         query = fields_binary_to_map fields
 
-        request(:delete, @no_zone_ep <> "/zones/#{zone}/autoscalers/#{autoscaler}", [], "", query)
+        request(:delete, get_no_zone_ep() <> "/zones/#{zone}/autoscalers/#{autoscaler}", [], "", query)
       end
 
       @doc """
@@ -126,7 +136,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def aggregated_list_of_autoscalers(query_params \\ %{}) do
         query = query_params |> URI.encode_query
 
-        request(:get, @no_zone_ep <> "/aggregated/autoscalers", [], "", query)
+        request(:get, get_no_zone_ep() <> "/aggregated/autoscalers", [], "", query)
       end 
       
       #################
@@ -141,7 +151,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def list_disk_types(zone, query_params \\ %{}) do 
         query = query_params |> URI.encode_query
 
-        request :get, @no_zone_ep <> "/zones/#{zone}/diskTypes", [], "", query
+        request :get, get_no_zone_ep() <> "/zones/#{zone}/diskTypes", [], "", query
       end
       
       @doc """
@@ -153,7 +163,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :get, 
-          @no_zone_ep <> "/zones/#{zone}/diskTypes/#{disk_type}",
+          get_no_zone_ep() <> "/zones/#{zone}/diskTypes/#{disk_type}",
           [],
           "",
           query)
@@ -167,7 +177,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def aggregated_list_of_disk_types(query_params \\ %{}) do
         query = query_params |> URI.encode_query
 
-        request :get, @no_zone_ep <> "/aggregated/diskTypes", [], "", query
+        request :get, get_no_zone_ep() <> "/aggregated/diskTypes", [], "", query
       end  
 
       #############
@@ -182,7 +192,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def list_disks(zone, query_params \\ %{}) do
         query = query_params |> URI.encode_query
         
-        request :get, @no_zone_ep <> "/zones/#{zone}/disks", [], "", query
+        request :get, get_no_zone_ep() <> "/zones/#{zone}/disks", [], "", query
       end
 
       @doc """
@@ -193,7 +203,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def get_disk(zone, disk, fields \\ "") do
         query = fields_binary_to_map fields  
 
-        request :get, @no_zone_ep <> "/zones/#{zone}/disks/#{disk}", [], "", query
+        request :get, get_no_zone_ep() <> "/zones/#{zone}/disks/#{disk}", [], "", query
       end
 
       @doc """
@@ -226,7 +236,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post,
-          @no_zone_ep <> "/zones/#{zone}/disks",
+          get_no_zone_ep() <> "/zones/#{zone}/disks",
           [{"Content-Type", "application/json"}],
           body,
           query)
@@ -239,7 +249,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def delete_disk(zone, disk, fields \\ "") do
         query = fields_binary_to_map fields
 
-        request :delete, @no_zone_ep <> "/zones/#{zone}/disks/#{disk}", [], "", query
+        request :delete, get_no_zone_ep() <> "/zones/#{zone}/disks/#{disk}", [], "", query
       end
 
       @doc """
@@ -253,7 +263,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @no_zone_ep <> "/zones/#{zone}/disks/#{disk}/resize", 
+          get_no_zone_ep() <> "/zones/#{zone}/disks/#{disk}/resize", 
           [{"Content-Type", "application/json"}], 
           body, 
           query)
@@ -267,7 +277,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def aggregated_list_of_disks(query_params \\ %{}) do
         query = query_params |> URI.encode_query
 
-        request :get, @no_zone_ep <> "/aggregated/disks", [], "", query
+        request :get, get_no_zone_ep() <> "/aggregated/disks", [], "", query
       end
       
       @doc """
@@ -283,7 +293,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @no_zone_ep <> "/zones/#{zone}/disks/#{disk}/createSnapshot",
+          get_no_zone_ep() <> "/zones/#{zone}/disks/#{disk}/createSnapshot",
           [{"Content-Type", "application/json"}],
           body,
           query)
@@ -301,7 +311,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def list_firewalls(query_params \\ %{}) do
         query = query_params |> URI.encode_query
 
-        request :get, @no_zone_ep <> "/global/firewalls", [], "", query
+        request :get, get_no_zone_ep() <> "/global/firewalls", [], "", query
       end
 
       @doc """
@@ -311,7 +321,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def get_firewall(firewall, fields \\ "") do
         query = fields_binary_to_map fields
 
-        request :get, @no_zone_ep <> "/global/firewalls/#{firewall}", [], "", query
+        request :get, get_no_zone_ep() <> "/global/firewalls/#{firewall}", [], "", query
       end
 
       @doc """
@@ -326,7 +336,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @no_zone_ep <> "/global/firewalls", 
+          get_no_zone_ep() <> "/global/firewalls", 
           [{"Content-Type", "application/json"}], 
           body, 
           query)
@@ -343,7 +353,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :patch, 
-          @no_zone_ep <> "/global/firewalls/#{firewall}", 
+          get_no_zone_ep() <> "/global/firewalls/#{firewall}", 
           [{"Content-Type", "application/json"}], 
           body, 
           query)
@@ -360,7 +370,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :put, 
-          @no_zone_ep <> "/global/firewalls/#{firewall}", 
+          get_no_zone_ep() <> "/global/firewalls/#{firewall}", 
           [{"Content-Type", "application/json"}], 
           body, 
           query)    
@@ -375,7 +385,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :delete,
-          @no_zone_ep <> "/global/firewalls/#{firewall}",
+          get_no_zone_ep() <> "/global/firewalls/#{firewall}",
           [],
           "",
           query)
@@ -392,7 +402,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def list_images(query_params \\ %{}) do
         query = query_params |> URI.encode_query
 
-        request :get, @no_zone_ep <> "/global/images", [], "", query
+        request :get, get_no_zone_ep() <> "/global/images", [], "", query
       end
 
       @doc """
@@ -407,7 +417,7 @@ defmodule GCloudex.ComputeEngine.Impl do
             %{"fields" => fields} |> URI.encode_query
           end  
 
-        request(:get, @no_zone_ep <> "/global/images/#{image}", [], "", query)
+        request(:get, get_no_zone_ep() <> "/global/images/#{image}", [], "", query)
       end
 
       @doc"""
@@ -422,7 +432,7 @@ defmodule GCloudex.ComputeEngine.Impl do
             %{"fields" => fields} |> URI.encode_query
           end
 
-        new_ep = @no_zone_ep |> String.replace(@project_id, project)
+        new_ep = get_no_zone_ep() |> String.replace(get_project_id, project)
 
         request(:get, new_ep <> "/global/images/#{image}", [], "", query)
       end
@@ -442,7 +452,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @no_zone_ep <> "/global/images", 
+          get_no_zone_ep() <> "/global/images", 
           [{"Content-Type", "application/json"}], 
           body,
           query)    
@@ -466,7 +476,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @no_zone_ep <> "/global/images", 
+          get_no_zone_ep() <> "/global/images", 
           [{"Content-Type", "application/json"}], 
           body,
           query)
@@ -484,7 +494,7 @@ defmodule GCloudex.ComputeEngine.Impl do
             %{"fields" => fields} |> URI.encode_query
           end  
 
-        request(:delete, @no_zone_ep <> "/global/images/#{image}", [], "", query)
+        request(:delete, get_no_zone_ep() <> "/global/images/#{image}", [], "", query)
       end
 
       @doc """
@@ -503,7 +513,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post,
-          @no_zone_ep <> "/global/images/#{image}/deprecate", 
+          get_no_zone_ep() <> "/global/images/#{image}/deprecate", 
           [{"Content-Type", "application/json"}], 
           body, 
           query)
@@ -521,7 +531,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def list_instance_groups(zone, query_params \\ %{}) do
         query = query_params |> URI.encode_query
 
-        request :get, @no_zone_ep <> "/zones/#{zone}/instanceGroups", [], "", query
+        request :get, get_no_zone_ep() <> "/zones/#{zone}/instanceGroups", [], "", query
       end
 
       @doc """
@@ -536,7 +546,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post,
-          @no_zone_ep <> "/zones/#{zone}/instanceGroups/#{instance_group}/listInstances",
+          get_no_zone_ep() <> "/zones/#{zone}/instanceGroups/#{instance_group}/listInstances",
           [{"Content-Type", "application/json"}],
           body,
           query)
@@ -549,7 +559,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def get_instance_group(zone, instance_group, fields \\ "") do
         query = fields_binary_to_map fields
 
-        request(:get, @no_zone_ep <> "/zones/#{zone}/instanceGroups/#{instance_group}", [], "", query)
+        request(:get, get_no_zone_ep() <> "/zones/#{zone}/instanceGroups/#{instance_group}", [], "", query)
       end
 
       @doc """
@@ -565,7 +575,7 @@ defmodule GCloudex.ComputeEngine.Impl do
         
         request(
           :post,
-          @no_zone_ep <> "/zones/#{zone}/instanceGroups",
+          get_no_zone_ep() <> "/zones/#{zone}/instanceGroups",
           [{"Content-Type", "application/json"}],
           body,
           query)
@@ -580,7 +590,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :delete,
-          @no_zone_ep <> "/zones/#{zone}/instanceGroups/#{instance_group}",
+          get_no_zone_ep() <> "/zones/#{zone}/instanceGroups/#{instance_group}",
           [],
           "",
           query) 
@@ -593,7 +603,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def aggregated_list_of_instance_groups(query_params \\ %{}) do
         query = query_params |> URI.encode_query
 
-        request(:get, @no_zone_ep <> "/aggregated/instanceGroups", [], "", query)
+        request(:get, get_no_zone_ep() <> "/aggregated/instanceGroups", [], "", query)
       end
 
       @doc """
@@ -608,7 +618,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @no_zone_ep <> "/zones/#{zone}/instanceGroups/#{instance_group}/addInstances", 
+          get_no_zone_ep() <> "/zones/#{zone}/instanceGroups/#{instance_group}/addInstances", 
           [{"Content-Type", "application/json"}], 
           body, 
           query)
@@ -626,7 +636,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @no_zone_ep <> "/zones/#{zone}/instanceGroups/#{instance_group}/removeInstances", 
+          get_no_zone_ep() <> "/zones/#{zone}/instanceGroups/#{instance_group}/removeInstances", 
           [{"Content-Type", "application/json"}], 
           body, 
           query)    
@@ -651,7 +661,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @no_zone_ep <> "/zones/#{zone}/instanceGroups/#{instance_group}/setNamedPorts", 
+          get_no_zone_ep() <> "/zones/#{zone}/instanceGroups/#{instance_group}/setNamedPorts", 
           [{"Content-Type", "application/json"}], 
           body, 
           query)
@@ -679,7 +689,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def list_instances(zone, query_params \\ %{}) do
         query = query_params |> URI.encode_query
 
-        request :get, @instance_ep <> "/#{zone}/instances", [], "", query
+        request :get, get_instance_ep() <> "/#{zone}/instances", [], "", query
       end
 
       @doc """
@@ -696,7 +706,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :get, 
-          @instance_ep <> "/#{zone}/instances/#{instance}", 
+          get_instance_ep() <> "/#{zone}/instances/#{instance}", 
           [], 
           "",
           query)
@@ -753,7 +763,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @instance_ep <> "/#{zone}/instances", 
+          get_instance_ep() <> "/#{zone}/instances", 
           [{"Content-Type", "application/json"}], 
           body,
           query)
@@ -773,7 +783,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :delete, 
-          @instance_ep <> "/#{zone}/instances/#{instance}", 
+          get_instance_ep() <> "/#{zone}/instances/#{instance}", 
           [], 
           "",
           query)
@@ -793,7 +803,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request( 
           :post, 
-          @instance_ep <> "/#{zone}/instances/#{instance}/start", 
+          get_instance_ep() <> "/#{zone}/instances/#{instance}/start", 
           [{"Content-Type", "application/json"}], 
           "",
           query)
@@ -813,7 +823,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @instance_ep <> "/#{zone}/instances/#{instance}/stop", 
+          get_instance_ep() <> "/#{zone}/instances/#{instance}/stop", 
           [{"Content-Type", "application/json"}], 
           "",
           query)
@@ -833,7 +843,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @instance_ep <> "/#{zone}/instances/#{instance}/reset",
+          get_instance_ep() <> "/#{zone}/instances/#{instance}/reset",
           [{"Content-Type", "application/json"}], 
           "",
           query)      
@@ -871,7 +881,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post,
-          @instance_ep <> "/#{zone}/instances/#{instance}/addAccessConfig",
+          get_instance_ep() <> "/#{zone}/instances/#{instance}/addAccessConfig",
           [{"Content-Type", "application/json"}],
           body |> Poison.encode!,
           query)
@@ -898,7 +908,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @instance_ep <> "/#{zone}/instances/#{instance}/deleteAccessConfig",
+          get_instance_ep() <> "/#{zone}/instances/#{instance}/deleteAccessConfig",
           [{"Content-Type", "application/json"}],
           "",
           query)
@@ -914,7 +924,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :get, 
-          @no_zone_ep <> "/aggregated/instances",
+          get_no_zone_ep() <> "/aggregated/instances",
           [],
           "",
           query)
@@ -958,7 +968,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @instance_ep <> "/#{zone}/instances/#{instance}/attachDisk",
+          get_instance_ep() <> "/#{zone}/instances/#{instance}/attachDisk",
           [{"Content-Type", "application/json"}],
           disk_resource |> Poison.encode!,
           query)
@@ -979,7 +989,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @instance_ep <> "/#{zone}/instances/#{instance}/detachDisk",
+          get_instance_ep() <> "/#{zone}/instances/#{instance}/detachDisk",
           [{"Content-Type", "application/json"}],
           "",
           query)
@@ -1006,7 +1016,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post,
-          @instance_ep <> "/#{zone}/instances/#{instance}/setDiskAutoDelete",
+          get_instance_ep() <> "/#{zone}/instances/#{instance}/setDiskAutoDelete",
           [{"Content-Type", "application/json"}],
           "",
           query)
@@ -1035,7 +1045,7 @@ defmodule GCloudex.ComputeEngine.Impl do
         
         request(
           :get, 
-          @instance_ep <> "/#{zone}/instances/#{instance}/serialPort",
+          get_instance_ep() <> "/#{zone}/instances/#{instance}/serialPort",
           [],
           "",
           query)
@@ -1057,7 +1067,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post,
-          @instance_ep <> "/#{zone}/instances/#{instance}/setMachineType",
+          get_instance_ep() <> "/#{zone}/instances/#{instance}/setMachineType",
           [{"Content-Type", "application/json"}],
           body,
           query)
@@ -1095,7 +1105,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post,
-          @instance_ep <> "/#{zone}/instances/#{instance}/setMetadata",
+          get_instance_ep() <> "/#{zone}/instances/#{instance}/setMetadata",
           [{"Content-Type", "application/json"}],
           body,
           query)
@@ -1123,7 +1133,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post,
-          @instance_ep <> "/#{zone}/instances/#{instance}/setScheduling",
+          get_instance_ep() <> "/#{zone}/instances/#{instance}/setScheduling",
           [{"Content-Type", "application/json"}],
           body,
           query)
@@ -1145,7 +1155,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post,
-          @instance_ep <> "/#{zone}/instances/#{instance}/setTags",
+          get_instance_ep() <> "/#{zone}/instances/#{instance}/setTags",
           [{"Content-Type", "application/json"}],
           body,
           query)
@@ -1162,7 +1172,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def get_license(license, fields \\ "") do
         query = fields_binary_to_map fields
 
-        request :get, @no_zone_ep <> "/global/licenses/#{license}", [], "", query
+        request :get, get_no_zone_ep() <> "/global/licenses/#{license}", [], "", query
       end  
 
       #####################
@@ -1177,7 +1187,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def list_machine_types(zone, query_params \\ %{}) do 
         query = query_params |> URI.encode_query
 
-        request(:get, @instance_ep <> "/#{zone}/machineTypes", [], "", query)
+        request(:get, get_instance_ep() <> "/#{zone}/machineTypes", [], "", query)
       end
 
       @doc """
@@ -1194,7 +1204,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :get, 
-          @instance_ep <> "/#{zone}/machineTypes/#{machine_type}", 
+          get_instance_ep() <> "/#{zone}/machineTypes/#{machine_type}", 
           [], 
           "", 
           query)
@@ -1208,7 +1218,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def aggregated_list_of_machine_types(query_params \\ %{}) do 
         query = query_params |> URI.encode_query
 
-        request :get, @no_zone_ep <> "/aggregated/machineTypes", [], "", query
+        request :get, get_no_zone_ep() <> "/aggregated/machineTypes", [], "", query
       end      
 
       ################
@@ -1223,7 +1233,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def list_networks(query_params \\ %{}) do
         query = query_params |> URI.encode_query
 
-        request :get, @no_zone_ep <> "/global/networks", [], "", query
+        request :get, get_no_zone_ep() <> "/global/networks", [], "", query
       end
 
       @doc """
@@ -1233,7 +1243,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def get_network(network, fields \\ "") do
         query = fields_binary_to_map fields
 
-        request :get, @no_zone_ep <> "/global/networks/#{network}", [], "", query
+        request :get, get_no_zone_ep() <> "/global/networks/#{network}", [], "", query
       end
 
       @doc """
@@ -1248,7 +1258,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :post, 
-          @no_zone_ep <> "/global/networks", 
+          get_no_zone_ep() <> "/global/networks", 
           [{"Content-Type", "application/json"}], 
           body, 
           query)
@@ -1263,7 +1273,7 @@ defmodule GCloudex.ComputeEngine.Impl do
 
         request(
           :delete,
-          @no_zone_ep <> "/global/networks/#{network}",
+          get_no_zone_ep() <> "/global/networks/#{network}",
           [], 
           "",
           query)
@@ -1280,7 +1290,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def list_regions(query_params \\ %{}) do
         query = query_params |> URI.encode_query
 
-        request :get, @no_zone_ep <> "/regions", [], "", query
+        request :get, get_no_zone_ep() <> "/regions", [], "", query
       end    
 
       @doc """
@@ -1295,7 +1305,7 @@ defmodule GCloudex.ComputeEngine.Impl do
             %{"fields" => fields} |> URI.encode_query
           end
 
-        request :get, @no_zone_ep <> "/regions/#{region}", [], "", query
+        request :get, get_no_zone_ep() <> "/regions/#{region}", [], "", query
       end  
 
       #############
@@ -1310,7 +1320,7 @@ defmodule GCloudex.ComputeEngine.Impl do
       def list_zones(query_params \\ %{}) do 
         query = query_params |> URI.encode_query
 
-        request :get, @no_zone_ep <> "/zones", [], "", query
+        request :get, get_no_zone_ep() <> "/zones", [], "", query
       end  
 
       @doc """
@@ -1325,7 +1335,7 @@ defmodule GCloudex.ComputeEngine.Impl do
             %{"fields" => fields} |> URI.encode_query
           end   
           
-        request :get, @no_zone_ep <> "/zones/#{zone}", [], "", query
+        request :get, get_no_zone_ep() <> "/zones/#{zone}", [], "", query
       end
 
       ###############

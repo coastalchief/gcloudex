@@ -11,7 +11,12 @@ defmodule GCloudex.CloudStorage.Request do
     quote do
 
       @endpoint "storage.googleapis.com"
-      @project_id GCloudex.get_project_id
+	  
+	  def get_project_id() do
+	   	{:ok, client_id} = Goth.Config.get("client_email")
+	   	{:ok, project_id} = Goth.Config.get(client_id, :project_id)
+		project_id
+	  end
 
       @doc"""
       Sends an HTTP request according to the Service resource in the Google Cloud
@@ -24,7 +29,7 @@ defmodule GCloudex.CloudStorage.Request do
           @endpoint,
           "",
           [
-            {"x-goog-project-id", @project_id},
+            {"x-goog-project-id", get_project_id()},
             {"Authorization", "Bearer #{Auth.get_token_storage(:full_control)}"}
           ],
           []

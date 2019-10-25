@@ -10,7 +10,11 @@ defmodule GCloudex.CloudSQL.Request do
   defmacro __using__(_opts) do 
     quote do 
 
-      @project_id GCloudex.get_project_id
+  	  def get_project_id() do
+  	   	{:ok, client_id} = Goth.Config.get("client_email")
+  	    {:ok, project_id} = Goth.Config.get(client_id, :project_id)
+  		project_id
+  	  end
 
       @doc """
       Sends a HTTP request with the given 'verb', 'headers' and 'body' to the 
@@ -23,7 +27,7 @@ defmodule GCloudex.CloudSQL.Request do
           verb,
           endpoint,
           body,
-          headers ++ [{"x-goog-project-id", @project_id},
+          headers ++ [{"x-goog-project-id", get_project_id()},
                       {"Authorization", "Bearer #{Auth.get_token_storage(:sql_admin)}"}],
           []
           )
@@ -40,7 +44,7 @@ defmodule GCloudex.CloudSQL.Request do
           verb,
           endpoint <> "/" <> parameters,
           body,
-          headers ++ [{"x-goog-project-id", @project_id},
+          headers ++ [{"x-goog-project-id", get_project_id()},
                       {"Authorization", "Bearer #{Auth.get_token_storage(:sql_admin)}"}],
           []
           )

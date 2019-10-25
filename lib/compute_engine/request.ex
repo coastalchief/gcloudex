@@ -8,8 +8,13 @@ defmodule GCloudex.ComputeEngine.Request do
   defmacro __using__(_opts) do 
     quote do 
       require Logger
-      @project_id  GCloudex.get_project_id
-
+	  
+	  def get_project_id do
+	   	{:ok, client_id} = Goth.Config.get("client_email")
+	    {:ok, project_id} = Goth.Config.get(client_id, :project_id)
+		project_id
+	  end
+	  
       @doc """
       
       """
@@ -26,7 +31,7 @@ defmodule GCloudex.ComputeEngine.Request do
           verb,
           endpoint,
           body,
-          headers ++ [{"x-goog-project-id", @project_id},
+          headers ++ [{"x-goog-project-id", get_project_id},
                       {"Authorization", "Bearer #{Auth.get_token_storage(:compute)}"}],
           []
           )
