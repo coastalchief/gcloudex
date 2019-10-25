@@ -296,7 +296,7 @@ defmodule GCloudex.CloudStorage.Impl do
       """
 	  @spec download_object(bucket :: binary, object :: binary, query_params :: [{binary, binary}]) :: HTTPResponse.t
 	  def download_object(bucket, object, query_params) do 
-		  download :get, bucket, object, query_params˝
+		  download :get, bucket, object, query_params
 	  end
 
       @doc"""
