@@ -289,17 +289,6 @@ defmodule GCloudex.CloudStorage.Impl do
       end
 	  
       @doc"""
-      Downloads the 'object' from the specified 'bucket' using the given
-      'query_params'. The query parameters must be passed as a list of tuples
-      [{param_1, value_1}, {param_2, value_2}]. The requester must have READ
-      permission.
-      """
-	  @spec download_object(bucket :: binary, object :: binary, query_params :: [{binary, binary}]) :: HTTPResponse.t
-	  def download_object(bucket, object, query_params) do 
-		  download :get, bucket, object, query_params
-	  end
-
-      @doc"""
       Lists the 'object' ACL from the specified 'bucket'. The requester must have
       FULL_CONTROL permission.
       """
